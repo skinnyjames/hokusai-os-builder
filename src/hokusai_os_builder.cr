@@ -11,6 +11,7 @@ module Hokusai::OS
     include Util::PlatformHelper
 
     def initialize
+      build_version(VERSION)
       install_dir("/opt/hokusai-#{VERSION}")
       barista_dir("/opt/hokusai-barista")
       replace("hokusai")

@@ -1,0 +1,38 @@
+name: build
+env:
+  USE_CACHE: true
+  GITHUB_WORKSPACE: ${{github.workspace}}
+on: 
+  push:
+    branches: ["main"]
+
+jobs:
+  native-image:
+    runs-on: ubuntu-22.04-arm
+    container:
+      image: 84codes/crystal:latest-alpine
+    steps:
+    - uses: actions/checkout@v3
+    - uses: actions/cache/restore@v3
+      id: cache-hokusai-os-restore
+      with:
+        path: /cache/hokusai-os
+        key: alpine-hokusai-os
+    - name: deps
+      run: apk add cmake wget clang make
+    - name: create builder
+      run: shards install && shards build
+    - name: setup
+      run: LOG_LEVEL=debug ./bin/hokusai-os-builder build --workers 4
+    - uses: actions/cache/save@v3
+      if: always()
+      with:
+        path: /cache/hokusai-os
+        key: ${{ steps.cache-hokusai-os-restore.outputs.cache-primary-key }}
+    - uses: actions/upload-artifact@v4
+      with:
+        name: os-build
+        path: /package.tar.gz
+        overwrite: true
+
+
