@@ -7,7 +7,8 @@ class Hokusai::OS::Tasks::Raylib < Barista::Task
   dependency SDL2
 
   def build : Nil
-    env = with_standard_compiler_flags(with_embedded_path)
+    env = with_standard_compiler_flags(with_embedded_path(with_destdir))
+    env["DESTDIR"] = "#{smart_install_dir}/embedded"
 
     command("ls", env: env)
     command(build_command, env: env, chdir: "#{source_dir}/src")
@@ -17,9 +18,8 @@ class Hokusai::OS::Tasks::Raylib < Barista::Task
   def build_command
     String.build do |io|
       io << "make"
-      io << " PREFIX=#{smart_install_dir}/embedded"
       io << " PLATFORM=PLATFORM_DESKTOP_SDL"
-      io << " GRAPHICS=GRAPHICS_API_OPENGL_21"
+      io << " GRAPHICS=GRAPHICS_API_OPENGL_ES2"
       io << " RAYLIB_LIBTYPE=SHARED"
       io << " C_INCLUDE_PATH=#{install_dir}/embedded/include/SDL2:$C_INCLUDE_PATH"
     end
@@ -29,7 +29,7 @@ class Hokusai::OS::Tasks::Raylib < Barista::Task
     String.build do |io|
       io << "make"
       io << " PREFIX=#{smart_install_dir}/embedded"
-      io <<  " install RAYLIB_LIBTYPE=SHARED"
+      io << " install RAYLIB_LIBTYPE=SHARED"
     end
   end
 

@@ -5,7 +5,7 @@ class Hokusai::OS::Tasks::SDL2 < Barista::Task
   nametag "sdl2"
 
   def build : Nil
-    env = with_standard_compiler_flags(with_embedded_path)
+    env = with_standard_compiler_flags(with_embedded_path(with_destdir))
 
     mkdir("build", parents: true)
     command("../configure --prefix=#{install_dir}/embedded", env: env, chdir: "#{source_dir}/build")
